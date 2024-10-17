@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Notifications\NewUserRegistered;
+use App\Events\NewUserRegistered;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Hash;
 
