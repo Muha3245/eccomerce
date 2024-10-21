@@ -42,6 +42,7 @@ class ItemImageController extends Controller
         return redirect()->route('item_images.index')->with('success', 'Images added successfully.');
     }
 
+
     public function edit(ItemImage $itemImage)
     {
         $items = Item::all();
@@ -80,4 +81,36 @@ class ItemImageController extends Controller
 
         return redirect()->route('item_images.index')->with('success', 'Image deleted successfully.');
     }
+
+    public function storeImages(Request $request)
+    {
+        $request->validate([
+            'item_id' => 'required|exists:item_images,id', // Validate item ID
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate images
+        ]);
+        $itemId = $request->input('item_id');
+        dd($itemId);
+        $images = $request->file('images');
+        // Store each image and create a record in the database
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $extension = $image->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $path = $image->storeAs('public/item_images', $filename); // Store the image in 'images' folder
+
+                // Save the image information in the database
+                ItemImage::create([
+                    'item_id' => $itemId,
+                    'image_path' => $filename,
+                ]);
+            }
+        }
+
+        // Render a success message or updated image list in HTML
+        // $html = view('item_images.index', [
+        //     'message' => 'Images uploaded successfully!',
+        //     'item_id' => $request->item_id
+        // ])->render();
+
+        return response()->json(['success' => true, 'message' => 'Images uploaded successfully!']);    }
 }
